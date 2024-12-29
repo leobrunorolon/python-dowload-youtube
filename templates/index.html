@@ -51,10 +51,11 @@
   </div>
 
   <script>
-    function downloadVideo() {
+    async function downloadVideo() {
       const link = document.getElementById('videoLink').value.trim();
       const message = document.getElementById('message');
 
+      // Verificación del enlace
       if (!link) {
         message.textContent = "Por favor, ingresa un enlace válido.";
         message.style.color = "red";
@@ -64,13 +65,16 @@
       message.textContent = "Procesando descarga...";
       message.style.color = "blue";
 
-      fetch('/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ link })
-      })
-      .then(response => response.json())
-      .then(data => {
+      try {
+        const response = await fetch('/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ link })
+        });
+
+        const data = await response.json();
+
+        // Verificación del éxito en la descarga
         if (data.success) {
           message.textContent = "Descarga completa. Revisa tu carpeta de descargas.";
           message.style.color = "green";
@@ -78,11 +82,14 @@
           message.textContent = "Error al descargar el video.";
           message.style.color = "red";
         }
-      })
-      .catch(error => {
+      } catch (error) {
         message.textContent = `Error: ${error.message}`;
         message.style.color = "red";
-      });
+      }
+      finally{
+        // Limpiar el campo de entrada
+        document.getElementById('videoLink').value = '';
+      }
     }
   </script>
 </body>

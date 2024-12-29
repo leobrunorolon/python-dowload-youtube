@@ -1,7 +1,15 @@
 from flask import Flask, request, jsonify, render_template
 import yt_dlp
+import os
 
 app = Flask(__name__)
+
+# Definir la ruta de la carpeta de descargas
+downloads_folder = os.path.join(os.getcwd(), 'descargas')
+
+# Crear la carpeta de descargas si no existe
+if not os.path.exists(downloads_folder):
+    os.makedirs(downloads_folder)
 
 @app.route('/')
 def home():
@@ -16,9 +24,10 @@ def download():
     if not link:
         return jsonify({"success": False, "message": "No se proporcionó ningún enlace."}), 400
 
+    # Establecer la ruta de salida en la carpeta 'descargas'
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
-        'outtmpl': '%(title)s.%(ext)s',
+        'outtmpl': os.path.join(downloads_folder, '%(title)s.%(ext)s'),
         'merge_output_format': 'mp4'
     }
 
